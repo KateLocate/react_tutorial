@@ -2,8 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 
-//When no one wins, display a message about the result being a draw.
-
 function Square(props) {
   return (
     <button className="square" onClick={props.onClick}
@@ -88,7 +86,6 @@ class Game extends React.Component {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
-    console.log(this.state.selectedMove, current);
     const moves = history.map((step, move) => {
       const desc = move ?
         'Go to move at cells ' + step.move :
@@ -105,6 +102,8 @@ class Game extends React.Component {
     let status;
     if (winner.winner) {
       status = 'Winner: ' + winner.winner;
+    } else if (this.state.selectedMove == 9) {
+      status = 'Draw!';
     } else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
     }
