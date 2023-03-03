@@ -2,10 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 
+//When no one wins, display a message about the result being a draw.
+
 function Square(props) {
   return (
-    <button className="square" onClick={props.onClick}>
-      {props.value}
+    <button className="square" onClick={props.onClick}
+      style={props.winSquares.indexOf(props.i) != -1 ? {backgroundColor: "lightblue"} : {backgroundColor: "white"}
+      }>
+        {props.value}
     </button>
   );
 }
@@ -16,6 +20,8 @@ class Board extends React.Component {
       <Square
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
+        winSquares={this.props.winSquares}
+        i={i}
       />
     );
   }
@@ -53,7 +59,9 @@ class Game extends React.Component {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
-    if (calculateWinner(squares) || squares[i]) {
+    const winner = calculateWinner(squares);
+
+    if (winner.winner || squares[i]) {
       return;
     }
     squares[i] = this.state.xIsNext ? 'X' : 'O';
@@ -95,8 +103,8 @@ class Game extends React.Component {
     });
 
     let status;
-    if (winner) {
-      status = 'Winner: ' + winner;
+    if (winner.winner) {
+      status = 'Winner: ' + winner.winner;
     } else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
     }
@@ -107,6 +115,7 @@ class Game extends React.Component {
           <Board
             squares={current.squares}
             onClick={i => this.handleClick(i)}
+            winSquares={winner.winCombo}
           />
         </div>
         <div className="game-info">
@@ -137,8 +146,8 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return {winner: squares[a], winCombo: [a, b, c]};
     }
   }
-  return null;
+  return {winner: null, winCombo: Array(3)};
 }
